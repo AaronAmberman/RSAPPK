@@ -161,8 +161,8 @@
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="File" />
-                            <TextBox Grid.Column="1" Margin="5,0" />
-                            <Button Grid.Column="2" Content="Browse" />
+                            <TextBox Grid.Column="1" Margin="5,0" Text="{Binding ImportFileName}" />
+                            <Button Grid.Column="2" Content="Browse" Command="{Binding ImportBrowseCommand}" />
                         </Grid>
                         <Grid Grid.Row="2" Margin="0,5,0,0">
                             <Grid.ColumnDefinitions>
@@ -171,8 +171,8 @@
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="PPK Pair Name" />
-                            <TextBox Grid.Column="1" Margin="5,0" />
-                            <Button Grid.Column="2" Content="Import PPK Pair" />
+                            <TextBox Grid.Column="1" Margin="5,0" Text="{Binding ImportPpkName}" />
+                            <Button Grid.Column="2" Content="Import PPK Pair" Command="{Binding ImportPpkCommand}" />
                         </Grid>
                         <Border Grid.Row="3" Background="Black" Height="2" Margin="0,10" />
                         <Grid Grid.Row="4">
@@ -215,8 +215,8 @@
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="File" />
-                            <TextBox Grid.Column="1" Margin="5,0" />
-                            <Button Grid.Column="2" Content="Browse" />
+                            <TextBox Grid.Column="1" Margin="5,0" Text="{Binding ExportFileName}" />
+                            <Button Grid.Column="2" Content="Browse" Command="{Binding ExportBrowseCommand}" />
                         </Grid>
                         <Grid Grid.Row="2" Margin="0,5,0,0">
                             <Grid.ColumnDefinitions>
@@ -225,8 +225,8 @@
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="PPK Pair Name" />
-                            <TextBox Grid.Column="1" Margin="5,0" />
-                            <Button Grid.Column="2" Content="Export PPK Pair" />
+                            <TextBox Grid.Column="1" Margin="5,0" Text="{Binding ExportPpkName}" />
+                            <Button Grid.Column="2" Content="Export PPK Pair" Command="{Binding ExportPpkCommand}" />
                         </Grid>
                     </Grid>
                 </TabItem>
