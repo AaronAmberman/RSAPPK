@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30804.86
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RSAPPK", "RSAPPK\RSAPPK.csproj", "{0DF226FC-83B4-417B-9991-B10298EC3EDA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RsaPpkManager", "RsaPpkManager\RsaPpkManager.csproj", "{EDC61EA6-F8B4-4A27-8218-D95C5107E847}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0DF226FC-83B4-417B-9991-B10298EC3EDA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DF226FC-83B4-417B-9991-B10298EC3EDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DF226FC-83B4-417B-9991-B10298EC3EDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0DF226FC-83B4-417B-9991-B10298EC3EDA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EDC61EA6-F8B4-4A27-8218-D95C5107E847}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EDC61EA6-F8B4-4A27-8218-D95C5107E847}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EDC61EA6-F8B4-4A27-8218-D95C5107E847}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EDC61EA6-F8B4-4A27-8218-D95C5107E847}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DDAD49C1-9D3C-4613-AC9C-F2928957E70A}
+	EndGlobalSection
+EndGlobal
