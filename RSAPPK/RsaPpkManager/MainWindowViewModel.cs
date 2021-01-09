@@ -26,6 +26,8 @@ namespace RsaPpkManager
         private ICommand deletePpkCommand;
         private string deletionPpkName;
         private bool hasConnectionBeenTestedSuccessfully;
+        private ICommand importPpkCommand;
+        private string importPpkName;
         private Visibility overlayVisibility = Visibility.Collapsed;
         private ICommand showDatabaseScriptCommand;
         private string overlayMessage;

@@ -26,7 +26,7 @@
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
-                        <TextBlock Grid.Row="0" TextWrapping="Wrap">
+                        <TextBlock Grid.Row="0" TextWrapping="Wrap" FontSize="16">
                             The use of Microsoft SQL Server is <Italic>optional</Italic> but it helps in managing PPK's. You'll have to create the database yourself but we'll 
                             give you the script to use. Use the button below to get the database create script. After the database is created enter the connection string in 
                             the text box below the button and click <Bold>Connect</Bold>. The user you connect to the database with has to have permissions to run SELECT, 
@@ -144,10 +144,17 @@
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
-                        <Grid Grid.Row="0">
+                        <TextBlock Grid.Row="0" TextWrapping="Wrap" FontSize="16">
+                            The file will be imported into Windows and stored under that PPK pair name.<LineBreak /><LineBreak />
+                            The imported file MUST come from the executable <Underline>ASPNET_REGIIS</Underline> as an export. It would just be easier to use this application's 
+                            <Underline>Export</Underline> tab to manage this problem. Have this application on the computer you want to export from and have it also on the computer 
+                            you want to import into. Export on one PC and import on another PC. This way data encrypted on one machine can be decrypted on another.
+                        </TextBlock>
+                        <Grid Grid.Row="1" Margin="0,10,0,0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
@@ -155,11 +162,20 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Column="0" Text="File" />
                             <TextBox Grid.Column="1" Margin="5,0" />
-                            <Button Grid.Column="2" Content="Open" />
+                            <Button Grid.Column="2" Content="Browse" />
                         </Grid>
-                        <Button Grid.Row="1" Content="Import" HorizontalAlignment="Center" Margin="0,20,0,0" />
-                        <Border Grid.Row="2" Background="Black" Height="2" Margin="0,20" />
-                        <Grid Grid.Row="3">
+                        <Grid Grid.Row="2" Margin="0,5,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="PPK Pair Name" />
+                            <TextBox Grid.Column="1" Margin="5,0" />
+                            <Button Grid.Column="2" Content="Import PPK Pair" />
+                        </Grid>
+                        <Border Grid.Row="3" Background="Black" Height="2" Margin="0,10" />
+                        <Grid Grid.Row="4">
                             <ListView Margin="0,5,0,0">
                                 <ListView.View>
                                     <GridView>
@@ -173,8 +189,8 @@
                                 </ListView.View>
                             </ListView>
                         </Grid>
-                        <Button Grid.Row="4" Content="Import Selected Database Record" HorizontalAlignment="Center" Margin="0,20,0,0" />
-                        <Border Grid.Row="3" Grid.RowSpan="5" Background="#AA000000" Visibility="{Binding DatabaseOverlayVisibility}">
+                        <Button Grid.Row="5" Content="Import Selected Database Record" HorizontalAlignment="Center" Margin="0,20,0,0" />
+                        <Border Grid.Row="4" Grid.RowSpan="5" Background="#AA000000" Visibility="{Binding DatabaseOverlayVisibility}">
                             <TextBlock TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Left" FontSize="24" Foreground="White"
                                        Text="Please connect to a database first in order to see the keys that exist in the database. This is optional." />
                         </Border>
@@ -185,18 +201,30 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="2*" />
                             <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
-                        <TextBlock TextWrapping="Wrap" FontSize="16">
-                                The key being exported needs to exist on the Windows operating system.
+                        <TextBlock Grid.Row="0" TextWrapping="Wrap" FontSize="16">
+                            The file will be saved at the location specified containing the XML for the PPK pair.<LineBreak /><LineBreak />
+                            Exporting can be useful in sharing PPK pairs across machines so that data can be encrypted on one machine and then decrypted on another.
                         </TextBlock>
-                        <Grid Grid.Row="1" Margin="0,10">
+                        <Grid Grid.Row="1">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Padding="0,1,0,0" Text="Private Public Key Pair Name" />
+                            <TextBlock Grid.Column="0" Text="File" />
+                            <TextBox Grid.Column="1" Margin="5,0" />
+                            <Button Grid.Column="2" Content="Browse" />
+                        </Grid>
+                        <Grid Grid.Row="2" Margin="0,5,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="PPK Pair Name" />
                             <TextBox Grid.Column="1" Margin="5,0" />
                             <Button Grid.Column="2" Content="Export PPK Pair" />
                         </Grid>
