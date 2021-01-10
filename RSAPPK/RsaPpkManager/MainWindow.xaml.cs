@@ -13,7 +13,9 @@ namespace RsaPpkManager
 
             DataContext = new MainWindowViewModel
             {
-                Dispatcher = Dispatcher
+                Dispatcher = Dispatcher,
+                RsaKeysViewSql = sqlTabListView,
+                RsaKeysViewImport = importTabListView
             };
         }
 

@@ -117,8 +117,6 @@
     <Resource Include="RsaPpkIcon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Add.png" />
-    <Resource Include="Edit.png" />
     <Resource Include="Remove.png" />
   </ItemGroup>
   <ItemGroup>
@@ -126,6 +124,9 @@
       <Project>{0df226fc-83b4-417b-9991-b10298ec3eda}</Project>
       <Name>RSAPPK</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Refresh.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

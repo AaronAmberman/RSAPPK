@@ -53,19 +53,25 @@
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            <Button Grid.Column="0" Content="Add" />
-                            <Button Grid.Column="1" Content="Edit" Margin="5,0" />
-                            <Button Grid.Column="2" Content="Remove" />
+                            <Button Grid.Column="0" Margin="0,0,5,0" ToolTip="Remove the selected RSA PPK from the database" Command="{Binding RemoveKeysCommand}">
+                                <Button.Content>
+                                    <Image Source="Remove.png" Width="24" />
+                                </Button.Content>
+                            </Button>
+                            <Button Grid.Column="1" ToolTip="Refresh the lilst of RSA PPKs" Command="{Binding RefreshKeysCommand}">
+                                <Button.Content>
+                                    <Image Source="Refresh.png" Width="24" />
+                                </Button.Content>
+                            </Button>
                         </Grid>
-                        <ListView Grid.Row="6" Margin="0,5,0,0">
+                        <ListView x:Name="sqlTabListView" Grid.Row="6" Margin="0,5,0,0" SelectionMode="Extended" ItemsSource="{Binding RsaPpks}">
                             <ListView.View>
                                 <GridView>
-                                    <GridViewColumn Header="Name"
+                                    <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}"
                                                     Width="{Binding ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListView}}, 
                                                                     Converter={StaticResource ArithmeticConverter}, ConverterParameter=*.25}" />
-                                    <GridViewColumn Header="RSA PPK XML"
+                                    <GridViewColumn Header="RSA PPK XML" DisplayMemberBinding="{Binding RsaPpkXml}"
                                                     Width="{Binding ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListView}}, 
                                                                     Converter={StaticResource ArithmeticConverter}, ConverterParameter=*.70}" />
                                 </GridView>
@@ -74,10 +80,6 @@
                         <Border Grid.Row="4" Grid.RowSpan="3" Background="#AA000000" Visibility="{Binding DatabaseOverlayVisibility}">
                             <TextBlock TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Left" FontSize="24" Foreground="White"
                                        Text="Please connect to a database first in order to see the keys that exist in the database. This is optional." />
-                        </Border>
-                        <Border Grid.Row="0" Grid.RowSpan="7" Background="#AA000000" Visibility="{Binding OverlayVisibility}">
-                            <TextBlock TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Left" FontSize="24" Foreground="White"
-                                       Text="{Binding OverlayMessage}" />
                         </Border>
                     </Grid>
                 </TabItem>
@@ -184,20 +186,20 @@
                         </Grid>
                         <Border Grid.Row="3" Background="Black" Height="2" Margin="0,10" />
                         <Grid Grid.Row="4">
-                            <ListView Margin="0,5,0,0">
+                            <ListView x:Name="importTabListView" Margin="0,5,0,0" SelectionMode="Single" ItemsSource="{Binding RsaPpks}">
                                 <ListView.View>
                                     <GridView>
-                                        <GridViewColumn Header="Name"
+                                        <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}"
                                                     Width="{Binding ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListView}}, 
                                                                     Converter={StaticResource ArithmeticConverter}, ConverterParameter=*.25}" />
-                                        <GridViewColumn Header="RSA PPK XML"
+                                        <GridViewColumn Header="RSA PPK XML" DisplayMemberBinding="{Binding RsaPpkXml}"
                                                     Width="{Binding ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListView}}, 
                                                                     Converter={StaticResource ArithmeticConverter}, ConverterParameter=*.70}" />
                                     </GridView>
                                 </ListView.View>
                             </ListView>
                         </Grid>
-                        <Button Grid.Row="5" Content="Import Selected Database Record" HorizontalAlignment="Center" Margin="0,20,0,0" />
+                        <Button Grid.Row="5" Content="Import Selected Database Record" HorizontalAlignment="Center" Margin="0,20,0,0" Command="{Binding ImportDatabasePpkCommand}" />
                         <Border Grid.Row="4" Grid.RowSpan="5" Background="#AA000000" Visibility="{Binding DatabaseOverlayVisibility}">
                             <TextBlock TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Left" FontSize="24" Foreground="White"
                                        Text="Please connect to a database first in order to see the keys that exist in the database. This is optional." />
@@ -254,6 +256,10 @@
                 <TextBlock Grid.Row="0" Text="Database Logging" />
                 <TextBox Grid.Row="1" IsReadOnly="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Text="{Binding DatabaseLog}" />
             </Grid>
+            <Border Grid.Row="0" Grid.RowSpan="3" Background="#AA000000" Visibility="{Binding OverlayVisibility}">
+                <TextBlock TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Left" FontSize="24" Foreground="White"
+                                       Text="{Binding OverlayMessage}" />
+            </Border>
         </Grid>
     </Grid>
 </Window>
