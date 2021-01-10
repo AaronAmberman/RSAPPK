@@ -106,7 +106,7 @@ namespace RSAPPK.Database
                 "CREATE TABLE[dbo].[RsaPpks](" + Environment.NewLine +
                 "    [Id][int] IDENTITY(1, 1) NOT NULL," + Environment.NewLine +
                 "    [Name] [varchar](250) NOT NULL," + Environment.NewLine +
-                "    [RsaPpkXml] [varchar](5) NOT NULL," + Environment.NewLine +
+                "    [RsaPpkXml] [varchar](1679) NOT NULL," + Environment.NewLine +
                 " CONSTRAINT[PK_RsaPpks] PRIMARY KEY CLUSTERED ([Id] ASC)" + Environment.NewLine +
                 " WITH(PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON[PRIMARY]" + Environment.NewLine +
                 ") ON[PRIMARY]" + Environment.NewLine +

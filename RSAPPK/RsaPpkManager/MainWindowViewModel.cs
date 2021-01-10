@@ -3,6 +3,7 @@ using RSAPPK;
 using RSAPPK.Database;
 using SNORM.ORM;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
@@ -23,6 +24,8 @@ namespace RsaPpkManager
         private ICommand createPpkCommand;
         private string creationPpkName;
         private SqlDatabase database;
+        private string databaseLog;
+        private Visibility databaseLoggingVisibility = Visibility.Collapsed;
         private Visibility databaseOverlayVisibility = Visibility.Visible;
         private ICommand deletePpkCommand;
         private string deletionPpkName;
@@ -58,13 +61,19 @@ namespace RsaPpkManager
                 if (database?.ConnectionState == System.Data.ConnectionState.Open)
                     database.Disconnect();
 
-                try
+                if (!string.IsNullOrWhiteSpace(value))
                 {
-                    database = new SqlDatabase(value);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Error occurred attempting to connect to database.{Environment.NewLine}{ex}", "Connection Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    try
+                    {
+                        database = new SqlDatabase(value)
+                        {
+                            Log = DatabaseLogging
+                        };
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error occurred attempting to initialize database.{Environment.NewLine}{ex}", "Initialization Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
                 }
 
                 OnPropertyChanged();
@@ -84,15 +93,22 @@ namespace RsaPpkManager
             }
         }
 
-        public ICommand DeletePpkCommand =>
-            deletePpkCommand ?? (deletePpkCommand = new RelayCommand(DeletePpk, CanDeletePpk));
-
-        public string DeletionPpkName
+        public string DatabaseLog
         {
-            get { return deletionPpkName; }
+            get { return databaseLog; }
             set
             {
-                deletionPpkName = value;
+                databaseLog = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public Visibility DatabaseLoggingVisibility 
+        {
+            get { return databaseLoggingVisibility; }
+            set 
+            { 
+                databaseLoggingVisibility = value;
                 OnPropertyChanged();
             }
         }
@@ -103,6 +119,19 @@ namespace RsaPpkManager
             set
             {
                 databaseOverlayVisibility = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public ICommand DeletePpkCommand =>
+            deletePpkCommand ?? (deletePpkCommand = new RelayCommand(DeletePpk, CanDeletePpk));
+
+        public string DeletionPpkName
+        {
+            get { return deletionPpkName; }
+            set
+            {
+                deletionPpkName = value;
                 OnPropertyChanged();
             }
         }
@@ -194,11 +223,11 @@ namespace RsaPpkManager
         public ICommand ShowDatabaseScriptCommand =>
             showDatabaseScriptCommand ?? (showDatabaseScriptCommand = new RelayCommand(ShowDatabaseScript));
 
-        public SolidColorBrush StatusBackground 
+        public SolidColorBrush StatusBackground
         {
             get { return statusBackground; }
-            set 
-            { 
+            set
+            {
                 statusBackground = value;
                 OnPropertyChanged();
             }
@@ -262,6 +291,7 @@ namespace RsaPpkManager
                 {
                     OverlayVisibility = Visibility.Visible;
                     OverlayMessage = "Attempting to connect to database...";
+                    DatabaseLoggingVisibility = Visibility.Visible;
                 }), DispatcherPriority.Normal);
 
                 if (database.Connect())
@@ -275,6 +305,8 @@ namespace RsaPpkManager
 
                         StatusBackground = Brushes.Green;
                         StatusMessage = "Connected to database";
+
+                        DatabaseLog += "Connected to database" + Environment.NewLine;
 
                         DatabaseOverlayVisibility = Visibility.Collapsed;
                     }), DispatcherPriority.Normal);
@@ -293,6 +325,8 @@ namespace RsaPpkManager
                         StatusBackground = Brushes.Red;
                         StatusMessage = "Failed to connect to database";
 
+                        DatabaseLog += "Failed to connect to database" + Environment.NewLine;
+
                         DatabaseOverlayVisibility = Visibility.Visible;
                     }), DispatcherPriority.Normal);
                 }
@@ -302,16 +336,27 @@ namespace RsaPpkManager
         private void CreatePpk()
         {
             string result = RsaPpkManagementService.CreateRsaPpkContainer(CreationPpkName);
+
+            MessageBox.Show(result, "Result of RSA PPK Operation");
+        }
+
+        private void DatabaseLogging(string message)
+        {
+            DatabaseLog += message += Environment.NewLine;
         }
 
         private void DeletePpk()
         {
             string result = RsaPpkManagementService.DeleteRsaPpkContainer(DeletionPpkName);
+
+            MessageBox.Show(result, "Result of RSA PPK Operation");
         }
 
         private void ExportPpk()
         {
             string result = RsaPpkManagementService.ExportRsaPpkContainer(ExportPpkName, ExportFileName);
+
+            MessageBox.Show(result, "Result of RSA PPK Operation");
         }
 
         private void ExportBrowse()
@@ -338,6 +383,8 @@ namespace RsaPpkManager
         private void ImportPpk()
         {
             string result = RsaPpkManagementService.ImportRsaPpkContainer(ImportPpkName, ImportFileName);
+
+            MessageBox.Show(result, "Result of RSA PPK Operation");
         }
 
         private void ImportBrowse()
@@ -349,7 +396,7 @@ namespace RsaPpkManager
                 Filter = "XML file (*.xml)|*.xml",
                 InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
                 Multiselect = false,
-                Title = "Export File"                
+                Title = "Export File"
             };
 
             bool? result = ofd.ShowDialog();

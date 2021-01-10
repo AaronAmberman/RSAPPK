@@ -6,8 +6,68 @@ namespace RSAPPK
     /// <summary>Handles the creation, deletion, importing and exporting of RSA PPK's.</summary>
     public static class RsaPpkManagementService
     {
+        #region Outputs
+
+        /*
+         * This is what this class will output for each method...
+         * 
+         * -------------------------------------------------------------------------------
+         * Create Results
+         * -------------------------------------------------------------------------------
+         * Creating RSA Key container...
+         * Succeeded!
+         * =====================================================================
+         * Creating RSA Key container...
+         * The RSA key container already exists.
+         * Failed!
+         * -------------------------------------------------------------------------------
+         * 
+         * 
+         * -------------------------------------------------------------------------------
+         * Delete Results
+         * -------------------------------------------------------------------------------
+         * Deleting RSA Key container...
+         * Succeeded!
+         * =====================================================================
+         * Deleting RSA Key container...
+         * The RSA key container was not found.
+         * Failed!
+         * -------------------------------------------------------------------------------
+         * 
+         * 
+         * -------------------------------------------------------------------------------
+         * Import Results
+         * -------------------------------------------------------------------------------
+         * Importing RSA Keys from file..
+         * Succeeded!
+         * =====================================================================
+         * Importing RSA Keys from file..
+         * Unable to find the specified file.
+         * Failed!
+         * -------------------------------------------------------------------------------
+         * 
+         * 
+         * -------------------------------------------------------------------------------
+         * Export Results
+         * -------------------------------------------------------------------------------
+         * Exporting RSA keys to file...
+         * Succeeded!
+         * =====================================================================
+         * Exporting RSA keys to file...
+         * The RSA key container was not found.
+         * Failed!
+         * -------------------------------------------------------------------------------
+         */
+
+        #endregion
+
         #region Fields
 
+        /*
+         * IMPORTANT!!!
+         * 
+         * Make sure to check this path when you first compile the code, yours may be in a different directory
+         */
         private static string aspnet_regiis = Environment.Is64BitOperatingSystem
                 ? @"C:\Windows\Microsoft.NET\Framework64\v4.0.30319\aspnet_regiis.exe"
                 : @"C:\Windows\Microsoft.NET\Framework\v4.0.30319\aspnet_regiis.exe";
@@ -136,24 +196,13 @@ namespace RSAPPK
 
         private static string RemoveAspNetToolInfoFromResultString(string result)
         {
-            var index = result.IndexOf("reserved.", StringComparison.OrdinalIgnoreCase);
+            int index = result.IndexOf("reserved.", StringComparison.OrdinalIgnoreCase);
 
-            var returnString = result.Substring(index + 9, result.Length - index - 9);
+            string returnString = result.Substring(index + 9, result.Length - index - 9).Replace("\n\r", "\r\n");
 
-            // there is an improper carriage return line feed in result...correct it
-            returnString = returnString.Replace("\n\r", "\r\n");
+            string[] lines = returnString.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
 
-            // remove all the formatting (so we can format it the way we want it)
-            var lines = returnString.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
-
-            if (lines.Length == 2)
-            {
-                returnString = lines[0] + Environment.NewLine + Environment.NewLine + lines[1];
-            }
-            else if (lines.Length == 3)
-            {
-                returnString = lines[0] + Environment.NewLine + Environment.NewLine + lines[1] + Environment.NewLine + lines[2];
-            }
+            returnString = string.Join(Environment.NewLine, lines);
 
             return returnString;
         }
