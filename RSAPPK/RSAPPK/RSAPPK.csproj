@@ -41,8 +41,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Cryptography\AesDataCryptographer.cs" />
-    <Compile Include="Cryptography\RsaKeyCryptographer.cs" />
     <Compile Include="Cryptography\TwoStageCryptographer.cs" />
     <Compile Include="Database\DatabaseCreator.cs" />
     <Compile Include="Database\RsaPpk.cs" />

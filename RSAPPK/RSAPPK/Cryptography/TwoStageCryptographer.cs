@@ -4,31 +4,30 @@ using System.Text;
 
 namespace RSAPPK.Cryptography
 {
-    /// <summary>A RSA key cryptographer and a AES data cryptographer.</summary>
+    /// <summary>A RSA key cryptographer and a AES data cryptographer combined.</summary>
     public class TwoStageCryptographer
     {
         #region Fields
 
-        private AesDataCryptographer dataCryptographer;
-        private int encryptedKeySize = 128;
-        private int initializationVectorSize = 16;
-        private RsaKeyCryptographer keyCryptographer;
-        private int keySize = 32;
+        private readonly int encryptedKeySize = 256;
+        private readonly int initializationVectorSize = 16;
+        private readonly int keySize = 32;
 
         #endregion
 
         #region Properties
 
-        public string PublicPrivateKeyXml { get; }
+        public string RsaPpkName { get; }
 
         #endregion
 
         #region Constructors
 
         /// <summary>Initializes a new instance of the <see cref="TwoStageCryptographer" /> class.</summary>
-        public TwoStageCryptographer(string publicPrivateKeyXml)
+        /// <param name="psaPpkName">The name of the RSA PPK pair to use.</param>
+        public TwoStageCryptographer(string rsaPpkName)
         {
-            PublicPrivateKeyXml = publicPrivateKeyXml;
+            RsaPpkName = rsaPpkName;
         }
 
         #endregion
@@ -38,76 +37,102 @@ namespace RSAPPK.Cryptography
         /// <summary>Decrypts the specified encrypted value.</summary>
         /// <param name="encryptedValue">The encrypted value.</param>
         /// <returns>The decrypted string.</returns>
+        /// <exception cref="System.Security.Cryptography.CryptographicException">When an error occurs during the decryption process.</exception>
         public string Decrypt(string encryptedValue)
         {
-            try
+            byte[] convertedEncryptedValue = Convert.FromBase64String(encryptedValue);
+
+            // copy the encrypted key out first
+            byte[] encryptedKey = new byte[encryptedKeySize];
+
+            Buffer.BlockCopy(convertedEncryptedValue, 0, encryptedKey, 0, encryptedKeySize);
+
+            // copy the encrypted data out second
+            byte[] encryptedData = new byte[convertedEncryptedValue.Length - encryptedKeySize];
+
+            Buffer.BlockCopy(convertedEncryptedValue, encryptedKeySize, encryptedData, 0, encryptedData.Length);
+
+            // decrypt the key third
+            RSACryptoServiceProvider rsa = new RSACryptoServiceProvider(2048, new CspParameters
             {
-                byte[] rawData = Convert.FromBase64String(encryptedValue);
+                KeyContainerName = RsaPpkName
+            });
 
-                byte[] key = new byte[keySize];
-                byte[] iv = new byte[initializationVectorSize];
-                byte[] encryptedKey = new byte[encryptedKeySize];
-                byte[] encryptedData = new byte[rawData.Length - encryptedKeySize];
+            byte[] encryptedKeyAndIv = rsa.Decrypt(encryptedKey, false);
 
-                Buffer.BlockCopy(rawData, 0, encryptedKey, 0, encryptedKey.Length);
-                Buffer.BlockCopy(rawData, encryptedKey.Length, encryptedData, 0, encryptedData.Length);
+            // next decrypt the data
+            byte[] key = new byte[32];
+            byte[] iv = new byte[initializationVectorSize];
 
-                keyCryptographer = new RsaKeyCryptographer(PublicPrivateKeyXml);
+            // get key
+            Buffer.BlockCopy(encryptedKeyAndIv, 0, key, 0, keySize);
 
-                byte[] decryptedKey = keyCryptographer.DecryptKey(encryptedKey);
+            // get initialization vector
+            Buffer.BlockCopy(encryptedKeyAndIv, keySize, iv, 0, initializationVectorSize);
 
-                Buffer.BlockCopy(decryptedKey, 0, key, 0, key.Length);
-                Buffer.BlockCopy(decryptedKey, key.Length, iv, 0, iv.Length);
-
-                dataCryptographer = new AesDataCryptographer(key, iv);
-
-                byte[] decryptedData = dataCryptographer.DecryptData(encryptedData);
-
-                string decryptedValue = Encoding.UTF8.GetString(decryptedData);
-
-                return decryptedValue;
-            }
-            catch (Exception ex)
+            AesCryptoServiceProvider aes = new AesCryptoServiceProvider
             {
-                throw new CryptographicException("An error occurred during the decryption process.", ex);
-            }
+                IV = iv,
+                Key = key
+            };
+
+            ICryptoTransform decryptor = aes.CreateDecryptor();
+
+            byte[] encodedValue = decryptor.TransformFinalBlock(encryptedData, 0, encryptedData.Length);
+
+            decryptor.Dispose();
+
+            string decryptedValue = Encoding.UTF8.GetString(encodedValue);
+
+            return decryptedValue;
         }
 
         /// <summary>Encrypts the specified value.</summary>
         /// <param name="value">The value.</param>
         /// <returns>The encrypted string.</returns>
+        /// <exception cref="System.Security.Cryptography.CryptographicException">When an error occurs during the decryption process.</exception>
         public string Encrypt(string value)
         {
-            try
+            // first generate our AES Key and IV
+            AesCryptoServiceProvider aes = new AesCryptoServiceProvider();
+            aes.GenerateIV();
+            aes.GenerateKey();
+
+            byte[] keyAndIv = new byte[aes.IV.Length + aes.Key.Length];
+
+            // copy them into an array together
+            Buffer.BlockCopy(aes.Key, 0, keyAndIv, 0, aes.Key.Length);
+            Buffer.BlockCopy(aes.IV, 0, keyAndIv, aes.Key.Length, aes.IV.Length);
+
+            // encrypt the key
+            RSACryptoServiceProvider rsa = new RSACryptoServiceProvider(2048, new CspParameters
             {
-                dataCryptographer = new AesDataCryptographer();
+                KeyContainerName = RsaPpkName
+            });
 
-                byte[] keyAndInitializationVectorBuffer = new byte[keySize + initializationVectorSize];
+            byte[] encryptedKeyAndIv = rsa.Encrypt(keyAndIv, false);
 
-                Buffer.BlockCopy(dataCryptographer.Key, 0, keyAndInitializationVectorBuffer, 0, keySize);
-                Buffer.BlockCopy(dataCryptographer.InitializationVector, 0, keyAndInitializationVectorBuffer, keySize, initializationVectorSize);
+            // next encrypt the data
+            byte[] encodedData = Encoding.UTF8.GetBytes(value);
 
-                keyCryptographer = new RsaKeyCryptographer(PublicPrivateKeyXml);
+            ICryptoTransform cryptoTransform = aes.CreateEncryptor();
 
-                byte[] encryptedKey = keyCryptographer.EncryptKey(keyAndInitializationVectorBuffer);
+            byte[] encryptedData = cryptoTransform.TransformFinalBlock(encodedData, 0, encodedData.Length);
 
-                byte[] rawData = Encoding.UTF8.GetBytes(value);
+            cryptoTransform.Dispose();
 
-                byte[] encryptedData = dataCryptographer.EncryptData(rawData);
+            byte[] encryptedKeyAndEncryptedData = new byte[encryptedKeyAndIv.Length + encryptedData.Length];
 
-                byte[] encryptedKeyAndEncryptedData = new byte[encryptedKey.Length + encryptedData.Length];
+            // copy in the encrypted key first
+            Buffer.BlockCopy(encryptedKeyAndIv, 0, encryptedKeyAndEncryptedData, 0, encryptedKeyAndIv.Length);
 
-                Buffer.BlockCopy(encryptedKey, 0, encryptedKeyAndEncryptedData, 0, encryptedKey.Length);
-                Buffer.BlockCopy(encryptedData, 0, encryptedKeyAndEncryptedData, encryptedKey.Length, encryptedData.Length);
+            // copy in the encrypted data second
+            Buffer.BlockCopy(encryptedData, 0, encryptedKeyAndEncryptedData, encryptedKeyAndIv.Length, encryptedData.Length);
 
-                var encryptedValue = Convert.ToBase64String(encryptedKeyAndEncryptedData);
+            // convert to a string and return
+            string convertedEncryptedValue = Convert.ToBase64String(encryptedKeyAndEncryptedData);
 
-                return encryptedValue;
-            }
-            catch (Exception ex)
-            {
-                throw new CryptographicException("An error occurred during the encryption process.", ex);
-            }
+            return convertedEncryptedValue;
         }
 
         #endregion

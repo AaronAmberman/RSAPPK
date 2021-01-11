@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using RSAPPK;
+using RSAPPK.Cryptography;
 using RSAPPK.Database;
 using SNORM.ORM;
 using System;
@@ -28,6 +29,13 @@ namespace RsaPpkManager
         private string databaseLog;
         private Visibility databaseLoggingVisibility = Visibility.Collapsed;
         private Visibility databaseOverlayVisibility = Visibility.Visible;
+        private string dataDecryptString;
+        private string dataDecryptStringOutput;
+        private ICommand dataDecryptCommand;
+        private string dataEncryptString;
+        private string dataEncryptStringOutput;
+        private ICommand dataEncryptCommand;
+        private string dataRsaPpkName;
         private ICommand deletePpkCommand;
         private string deletionPpkName;
         private ICommand exportBrowseCommand;
@@ -124,6 +132,62 @@ namespace RsaPpkManager
             set
             {
                 databaseOverlayVisibility = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string DataDecryptString
+        {
+            get { return dataDecryptString; }
+            set
+            {
+                dataDecryptString = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string DataDecryptStringOutput
+        {
+            get { return dataDecryptStringOutput; }
+            set
+            {
+                dataDecryptStringOutput = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public ICommand DataDecryptCommand =>
+            dataDecryptCommand ?? (dataDecryptCommand = new RelayCommand(DecryptData, CanDecryptData));
+
+        public string DataEncryptString
+        {
+            get { return dataEncryptString; }
+            set
+            {
+                dataEncryptString = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string DataEncryptStringOutput
+        {
+            get { return dataEncryptStringOutput; }
+            set
+            {
+                dataEncryptStringOutput = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public ICommand DataEncryptCommand =>
+            dataEncryptCommand ?? (dataEncryptCommand = new RelayCommand(EncryptData, CanEncryptData));
+
+        public string DataRsaPpkName
+        {
+            get { return dataRsaPpkName; }
+            set
+            {
+                dataRsaPpkName = value;
                 OnPropertyChanged();
             }
         }
@@ -288,9 +352,19 @@ namespace RsaPpkManager
             return !string.IsNullOrWhiteSpace(connectionString);
         }
 
+        private bool CanDecryptData()
+        {
+            return !string.IsNullOrWhiteSpace(dataDecryptString) && !string.IsNullOrWhiteSpace(dataRsaPpkName);
+        }
+
         private bool CanDeletePpk()
         {
             return !string.IsNullOrWhiteSpace(deletionPpkName);
+        }
+
+        private bool CanEncryptData()
+        {
+            return !string.IsNullOrWhiteSpace(dataEncryptString) && !string.IsNullOrWhiteSpace(dataRsaPpkName);
         }
 
         private bool CanExportPpk()
@@ -421,6 +495,8 @@ namespace RsaPpkManager
 
                         string text = File.ReadAllText(tempFile);
 
+                        File.Delete(tempFile);
+
                         if (database.Connect())
                         {
                             // if we have a match and they chose to replace it then update the existing, if not insert a new one
@@ -468,11 +544,39 @@ namespace RsaPpkManager
             DatabaseLog += message += Environment.NewLine;
         }
 
+        private void DecryptData()
+        {
+            try
+            {
+                TwoStageCryptographer tsc = new TwoStageCryptographer(DataRsaPpkName);
+
+                DataDecryptStringOutput = tsc.Decrypt(DataDecryptString);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString(), "Decrypt Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
         private void DeletePpk()
         {
             string result = RsaPpkManagementService.DeleteRsaPpkContainer(DeletionPpkName);
 
             MessageBox.Show(result, "Result of Delete Operation");
+        }
+
+        private void EncryptData()
+        {
+            try
+            {
+                TwoStageCryptographer tsc = new TwoStageCryptographer(DataRsaPpkName);
+
+                DataEncryptStringOutput = tsc.Encrypt(DataEncryptString);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString(), "Encrypt Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void ExportBrowse()
@@ -623,6 +727,8 @@ namespace RsaPpkManager
                         RsaPpkManagementService.ExportRsaPpkContainer(ImportPpkName, tempFile);
 
                         string text = File.ReadAllText(tempFile);
+
+                        File.Delete(tempFile);
 
                         if (database.Connect())
                         {
