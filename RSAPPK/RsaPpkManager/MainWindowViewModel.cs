@@ -62,7 +62,7 @@ namespace RsaPpkManager
         #region Properties
 
         public ICommand ConnectDatabaseCommand =>
-            connectDatabaseCommand ?? (connectDatabaseCommand = new RelayCommand(ConnectDatabase, CanConnectDatabase));
+            connectDatabaseCommand ?? (connectDatabaseCommand = new RelayCommand(ConnectDatabase));
 
         public string ConnectionString
         {
@@ -347,11 +347,6 @@ namespace RsaPpkManager
             return !string.IsNullOrWhiteSpace(creationPpkName);
         }
 
-        private bool CanConnectDatabase()
-        {
-            return !string.IsNullOrWhiteSpace(connectionString);
-        }
-
         private bool CanDecryptData()
         {
             return !string.IsNullOrWhiteSpace(dataDecryptString) && !string.IsNullOrWhiteSpace(dataRsaPpkName);
@@ -389,6 +384,13 @@ namespace RsaPpkManager
 
         private void ConnectDatabase()
         {
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                MessageBox.Show("Please enter a valid MS SQL Server connection, any valid string will work.", "Need Connection String", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                return;
+            }
+
             if (database == null)
             {
                 MessageBox.Show("Please enter a connection string. Any valid MS SQL connection string will work.", "Connection Error", MessageBoxButton.OK, MessageBoxImage.Error);
